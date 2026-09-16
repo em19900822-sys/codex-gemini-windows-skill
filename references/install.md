@@ -57,6 +57,8 @@ $bridgeCli = Join-Path $toolRoot 'Scripts\codex-antigravity.exe'
 
 这是 CLI 的配置动作，不要直接把真实密钥作为参数。LOCAL_GEMINI_PROXY_KEY 要由运行中转的进程读取本机反重力配置后设置；只保存变量名不会让模型自动可见。
 
+上例用于尚未配置该提供商的全新安装。`provider set --model` 会整体替换模型列表；已有配置或需要同时接入 3.5 Flash-Lite、3.8 Flash、3.1 Pro 时，按 [add-models.md](add-models.md) 读取并保留原列表，再重复传入所有要保留的 `--model`。不要直接执行上例覆盖现成配置。
+
 确认 GPT 走原 ChatGPT 认证：
 
 - 启用 ANTIGRAVITY_OPENAI_USE_CODEX_AUTH=1。
@@ -98,6 +100,8 @@ Start-Process -WindowStyle Hidden 只表示隐藏窗口，不证明脱离执行�
 ~~~
 
 必须保留 GPT 的原生元数据。不要把 GPT 完整模板与模型指令复制给 Gemini；不要将所有 GPT 名称重命名映射到 Gemini。目录是静态文件，以后增加模型需要刷新。
+
+`--native` 仅用于全新目录初始化，会显式设置本方案需要的传输标记。已有目录增加模型时改用 `--base-catalog`，完整保留包括 `use_responses_lite` 是否存在在内的旧字段；`--model` 可重复。输入与输出必须是不同文件，先产出候选目录。具体多模型命令见 [add-models.md](add-models.md)。
 
 先把下面连接字段写入独立 bridge-test.toml，用验证脚本的 --test-config 参数测试；该参数只用于临时对话，不修改全局配置。验证后才把这些字段合并进全局 config.toml。下面不是替换整份配置的模板。顶层字段必须位于所有表之前：
 

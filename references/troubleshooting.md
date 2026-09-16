@@ -22,6 +22,10 @@
 | 端口被占用 | 监听 PID、可执行路径和服务身份 | 未知程序不终止；选空闲端口并同步修改上游注册、启动参数、Codex 配置和测试 |
 | ChatGPT 登录过期 | Codex 登录状态，不输出 token | 用户在该电脑重新登录；中转只读现有认证，不能承诺自动续期 |
 | 存在 antigravity-openai.json | 配置是否另有合法用途、是否会选付费 API | 暂停依赖该配置的部署并核对，不删除、不自动使用付费连接 |
+| 新增模型后原来的 Gemini 消失 | provider 注册前后的完整 models 列表；原目录和新目录的 ID | provider set 的 --model 是整体替换。合并完整旧列表，再生成候选目录；不要用原生 GPT 快照替代已有混合目录 |
+| antigravity-providers.json 用 JSON 解析在开头报错 | 文件是否由当前中转的安全存储接口生成 | 该版本使用 Fernet 加密；扩展名不是明文保证。用 load_provider_config_read_only 取必要字段，写入用 CLI 或 set_provider_config，不按 UTF-8 错误重建或打印全文 |
+| 扩展列表时发现旧 Gemini 的 use_responses_lite 被改变 | 追加前后每个已有模型的完整字段及字段是否存在 | 用 --base-catalog 保留旧条目，只有 --native 初始化才调整原生传输标记。发现差异停止发布，不能忽略保护断言 |
+| 3.8 Flash 没有无后缀 ID，或 Pro 返回其他模型标识 | 8045 实际列出的 ID、请求 ID、正常回复、返回 model 字段 | 本机用过 gemini-3.8-flash-high；3.1-pro-high 响应曾为 gemini-pro-agent。按实际可用路由测试并记录，不自行创造别名或凭返回标识猜版本 |
 
 ## 最小证据输出
 

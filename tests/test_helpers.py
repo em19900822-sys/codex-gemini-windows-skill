@@ -35,13 +35,79 @@ class HelpersTest(unittest.TestCase):
         native = merged["models"][0]
         self.assertEqual(native["base_instructions"], "NATIVE_ONLY")
         self.assertEqual(native["input_modalities"], ["text", "image"])
-        self.assertFalse(native["use_responses_lite"])
+        self.assertEqual(native, original["models"][0])
         self.assertEqual(merged["models"][1]["base_instructions"], "OWN_INSTRUCTIONS")
         self.assertEqual(merged["models"][1]["input_modalities"], ["text"])
 
     def test_missing_model_is_not_invented(self):
         with self.assertRaises(ValueError):
             build_catalog.merge_catalog(self.native, self.gateway, "not-available")
+
+    def test_multiple_new_models_preserve_every_existing_field(self):
+        self.native["catalog_version"] = {"source": "local-fixture"}
+        self.native["models"].append({"slug": "google-antigravity:existing", "custom_field": [1, 2]})
+        original = copy.deepcopy(self.native)
+        additions = [dict(self.extra, id="google-antigravity:new-" + str(i)) for i in range(3)]
+        merged = build_catalog.merge_catalog(self.native, {"data": additions}, [m["id"] for m in additions])
+        self.assertEqual(merged["models"][:2], original["models"])
+        self.assertEqual(merged["catalog_version"], original["catalog_version"])
+        self.assertEqual(len(merged["models"]), 5)
+        self.assertNotIn("use_responses_lite", merged["models"][1])
+        self.assertEqual(self.native, original)
+
+    def test_only_fresh_native_setup_changes_transport_flags(self):
+        merged = build_catalog.merge_catalog(self.native, self.gateway, self.extra["id"], initialize_native=True)
+        self.assertFalse(merged["models"][0]["use_responses_lite"])
+        self.assertTrue(self.native["models"][0]["use_responses_lite"])
+
+    def test_repeated_requests_preserve_existing_entries_without_duplicates(self):
+        first = build_catalog.merge_catalog(self.native, self.gateway, self.extra["id"])
+        repeated = build_catalog.merge_catalog(first, self.gateway, [self.extra["id"], self.extra["id"]],
+            display_names={self.extra["id"]: "Do not rename an existing entry"})
+        self.assertEqual(repeated, first)
+
+    def test_cli_adds_multiple_models_and_friendly_names(self):
+        second = dict(self.extra, id="google-antigravity:second")
+        with tempfile.TemporaryDirectory() as tmp:
+            source = Path(tmp) / "base.json"
+            target = Path(tmp) / "candidate.json"
+            source.write_text(json.dumps(self.native), encoding="utf-8")
+            original = source.read_bytes()
+            args = ["build_catalog.py", "--base-catalog", str(source), "--output", str(target),
+                "--model", self.extra["id"], "--model", second["id"],
+                "--display-name", second["id"] + "=Second model"]
+            with patch.object(sys, "argv", args), patch("build_catalog.local_json", return_value={"data": [self.extra, second]}), patch("sys.stdout", new_callable=io.StringIO):
+                build_catalog.main()
+            merged = common.load_json(target)
+            self.assertEqual(merged["models"][0], self.native["models"][0])
+            self.assertEqual(merged["models"][-1]["display_name"], "Second model")
+            self.assertEqual(source.read_bytes(), original)
+
+    def test_missing_batch_model_leaves_no_partial_output(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            source = Path(tmp) / "base.json"
+            target = Path(tmp) / "candidate.json"
+            source.write_text(json.dumps(self.native), encoding="utf-8")
+            original = source.read_bytes()
+            args = ["build_catalog.py", "--base-catalog", str(source), "--output", str(target),
+                "--model", self.extra["id"], "--model", "not-available"]
+            with patch.object(sys, "argv", args), patch("build_catalog.local_json", return_value=self.gateway):
+                with self.assertRaises(ValueError):
+                    build_catalog.main()
+            self.assertFalse(target.exists())
+            self.assertEqual(source.read_bytes(), original)
+
+    def test_cli_refuses_input_overwrite_even_with_replace(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            source = Path(tmp) / "base.json"
+            source.write_text(json.dumps(self.native), encoding="utf-8")
+            original = source.read_bytes()
+            args = ["build_catalog.py", "--base-catalog", str(source), "--output", str(source),
+                "--model", self.extra["id"], "--replace"]
+            with patch.object(sys, "argv", args), patch("sys.stderr", new_callable=io.StringIO):
+                with self.assertRaises(SystemExit):
+                    build_catalog.main()
+            self.assertEqual(source.read_bytes(), original)
 
     def test_duplicate_ids_and_incomplete_metadata_are_rejected(self):
         self.native["models"].append(copy.deepcopy(self.native["models"][0]))

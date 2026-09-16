@@ -28,5 +28,7 @@
 - **已观察**：旧对话绑定 `openai` 时 Gemini 被 OpenAI 拒绝；新对话绑定 `local-unified`。
 - **已复现实测**：无本机代理例外时测试进程得到 502，加入本机 `NO_PROXY` 后桌面后台协议返回正常 Gemini 文本。
 - **已观察**：测试后两个服务进程退出；独立后台启动后，在后续多个检查中仍存活。不能把具体退出原因或长期可靠性一概推断为已证实。
-- **用户验收**：GPT 与 Gemini 两个模型都在桌面实际回答。
+- **用户验收**：原 GPT 与 Gemini 3.7 两个模型都在桌面实际回答。
+- **新增模型后台实测（2026-09-16）**：`gemini-3.5-flash-lite`、`gemini-3.8-flash-high`、`gemini-3.1-pro-high` 分别通过反代回复和 Codex 新临时对话的正常回复；正式 `model/list` 读取包含三者与原 GPT/3.7。3.8 通过一次只打印确认文字的工具调用，GPT 复测正常。新增三者尚未获用户桌面分别切换验收；详见 [add-models.md](add-models.md)。
+- **源码核对**：固定中转版本的 `byok.py` 中 `set_provider_config` 替换整个 `models` 字段、保留未指定连接字段；`storage.py` 负责加密读写；`server.py` 的模型清单及 BYOK 路由按请求加载 provider 配置。默认 provider 配置路径位于用户 `.codex`，不随 `CODEX_HOME` 改变。应通过其只读/API接口操作，不把加密文件当普通 JSON。
 - **未扩展验证**：新电脑、其他账号、后续版本、所有多模态功能，以及 Windows 重新登录后的自启动，需要分别验收。

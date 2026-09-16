@@ -1,6 +1,6 @@
 ---
 name: codex-gemini-windows-skill
-description: 在 Windows 电脑安装、迁移或排查 Codex 桌面的 Gemini 与原生 GPT 共存接入；适用于 Antigravity Tools、本地反代、模型列表出现但不能聊天、ChatGPT 账号不支持 Gemini、502/503 和后台退出。保留原 ChatGPT 登录，不用于普通网页 Gemini 或替换付费 API。
+description: 在 Windows 电脑安装、迁移、追加模型或排查 Codex 桌面的 Gemini 与原生 GPT 共存接入；适用于 Antigravity Tools、本地反代、多款 Gemini 同时接入、模型列表出现但不能聊天、ChatGPT 账号不支持 Gemini、502/503 和后台退出。保留原 ChatGPT 登录，不用于普通网页 Gemini 或替换付费 API。
 ---
 
 # Windows 上让 Codex 同时使用 GPT 与 Gemini
@@ -20,6 +20,7 @@ Codex 新对话 → local-unified → 本机统一中转
 ## 先选任务
 
 - 全新安装或另一台电脑：读 [references/install.md](references/install.md)，先检查已有环境，再部署。
+- 已能使用、需要增加 Gemini：读 [references/add-models.md](references/add-models.md)。包含 3.5 Flash-Lite、3.8 Flash、3.1 Pro 的本机验证记录、多个模型一起追加及保留原 GPT/3.7 的流程；新电脑仍以账号实际可用 ID 为准。
 - 已经安装但报错：读 [references/troubleshooting.md](references/troubleshooting.md)，先定位失败层，不先重装。
 - 用户只问状态：使用 `scripts/diagnose.py` 做只读检查；不要自动重写配置。
 - 回退：读取目标电脑自己的备份和安装记录。优先恢复本次修改项，不从其他电脑复制配置覆盖。
@@ -41,7 +42,7 @@ Python 脚本使用 Python 3.11+ 标准库，不要求额外库。
 | 脚本 | 用途 | 修改范围 |
 | --- | --- | --- |
 | `scripts/diagnose.py` | 检查提供商、端口、本机代理例外、服务和指定旧对话 | 只读；无模型生成 |
-| `scripts/build_catalog.py` | 合并目标电脑的 GPT 目录与中转实际返回的 Gemini 元数据 | 只写显式输出文件，不碰账号 |
+| `scripts/build_catalog.py` | 初始化目录，或用 `--base-catalog` 和重复 `--model` 一次追加多个模型 | 只写候选输出；追加模式完整保留已有条目，不碰账号 |
 | `scripts/probe_app_server.py` | 用桌面后台协议测试一个临时新对话 | 消耗现有模型额度；不保存对话，需传本机 Codex 路径和模型 ID |
 | `scripts/Start-Bridge.ps1` | 启动已配置的两段本机连接 | 本机进程、运行日志；不修改 Codex 配置和用户代理设置 |
 

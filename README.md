@@ -4,6 +4,8 @@
 
 这个仓库提供给 Codex 执行的操作流程、排错表和辅助脚本，**不是模型、账号包，也不是反代软件本体**。没有附带登录凭据或软件安装程序。
 
+已补入 **Gemini 3.5 Flash-Lite、Gemini 3.8 Flash、Gemini 3.1 Pro** 的追加流程，可与已有 GPT 和 Gemini 3.7 共存。脚本支持一次追加多个模型，并完整保留已有模型设置。具体 ID 与验证范围见[多模型追加指南](references/add-models.md)。
+
 ## 在办公室电脑使用
 
 1. 下载仓库 ZIP 并解压。
@@ -16,6 +18,10 @@
 重开或刷新 Codex 后，可直接说：
 
 > 使用 $codex-gemini-windows-skill，帮我在这台电脑安装并验证 Gemini 和 GPT 都能用。
+
+要一起接入这次新增的三个模型，可以说：
+
+> 使用 $codex-gemini-windows-skill，把我账号实际可用的 Gemini 3.5 Flash-Lite、3.8 Flash、3.1 Pro 加入 Codex，保留原 GPT 和已有 Gemini，逐个测试后再更新正式列表。
 
 如果已经安装但报错：
 
@@ -36,16 +42,19 @@
 
 流程来自 2026-09-16 一台 Windows 电脑的实际部署，最终用户确认 GPT 和 Gemini 均能在桌面回答。本仓库新增的脚本另有本地检查和隔离测试；办公室电脑尚需独立部署和验收。
 
-发布前已通过 17 项 Python 离线测试、Windows PowerShell 5.1 安装与启动保护测试，以及 Skill 格式检查。只读诊断和模型目录生成也已在基线电脑运行验证；这些检查没有代替新电脑的实际聊天验收。
+脚本检查包括 Python 离线测试、Windows PowerShell 5.1 安装与启动保护测试，以及 Skill 格式检查。只读诊断和模型目录生成也已在基线电脑运行验证；这些检查没有代替新电脑的实际聊天验收。
 
 历史成功组合：Antigravity Tools 4.7.2、codex-antigravity-auth 2.2.0、Codex CLI 0.154.0-alpha.6.2。它们是复现基线，不是“最新版本”声明。`gemini-3.7-flash-high` 是当时实际通过的模型 ID，新电脑必须以账号实际可用模型和调用结果为准。
 
 已验证的主要能力是文字对话及一次本地工具调用；不据此承诺所有图片、语音、插件或其他模型能力。
 
+2026-09-16 追加的三个模型均已通过反代文字回复、Codex 临时新对话回复和正式模型列表读取；3.8 Flash 另通过一次无副作用工具调用，原 GPT 复测正常。**新增三个模型尚未取得用户在桌面分别切换并发送消息的最终确认**，与原先 GPT + Gemini 3.7 的用户验收分开记录。
+
 ## 文件入口
 
 - [SKILL.md](SKILL.md)：Codex 执行入口。
 - [完整安装流程](references/install.md)：从检查环境到桌面验收。
+- [多模型追加指南](references/add-models.md)：3.5 Flash-Lite、3.8 Flash、3.1 Pro，一起追加并保留已有模型。
 - [报错排查表](references/troubleshooting.md)：按实际症状定位。
 - [来源与版本基线](references/sources.md)：上游项目与官方文档。
 - `scripts/`：不含账号的辅助脚本。
