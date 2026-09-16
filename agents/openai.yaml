@@ -1,0 +1,4 @@
+interface:
+  display_name: "Codex 接入 Gemini：安装与排错"
+  short_description: "在 Windows 安装 Gemini 与 GPT 共存连接，排查旧对话、网络代理和后台服务问题"
+  default_prompt: "使用 $codex-gemini-windows-skill，检查这台 Windows 电脑，安装 Gemini 与原有 GPT 共存的 Codex 连接，并完成桌面实际对话验收。"
