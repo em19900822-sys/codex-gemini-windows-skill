@@ -89,6 +89,8 @@ Start-Process -WindowStyle Hidden 只表示隐藏窗口，不证明脱离执行�
 
 登录自启动可以是当前用户 Startup 目录中指向该脚本的快捷方式，传入这台电脑实际参数，并使用隐藏窗口。记录捷径路径供撤销；无需管理员或系统服务。自启动尚未实测重新登录时写“已配置、未验收”，不是“已验证”。
 
+后台启动与 Codex 窗口启动要分别检查。用户选择“先连接代理，再手动打开 Codex”时，后台可以等待代理就绪再自动启动，启动项不应打开 Codex/ChatGPT 桌面程序。代理软件若会在重启时更换本地端口，只等待开机就绪还不够；按 [proxy-port-recovery.md](proxy-port-recovery.md) 核对是否需要后台自动跟随。Start-Bridge.ps1 只负责单次启动，不是持续监控器，也不会重启已经运行的服务。
+
 ## 5. 模型目录与配置
 
 运行中转后，其 /v1/models 应包含带前缀的 Gemini ID，例如 google-antigravity:gemini-3.7-flash-high。冒号是当前统一中转命名，不能照搬截图中的斜杠名称。

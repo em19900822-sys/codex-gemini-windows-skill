@@ -6,6 +6,8 @@
 
 已补入 **Gemini 3.5 Flash-Lite、Gemini 3.8 Flash、Gemini 3.1 Pro** 的追加流程，可与已有 GPT 和 Gemini 3.7 共存。脚本支持一次追加多个模型，并完整保留已有模型设置。具体 ID 与验证范围见[多模型追加指南](references/add-models.md)。
 
+**2026-09-22 更新：** 补入代理重启更换端口，导致 GPT 502、Gemini Google 授权刷新 503 的实际故障与恢复流程；包括后台自动跟随端口、保留 Codex 窗口手动打开，以及恢复后的验证边界。见[代理端口变化与恢复](references/proxy-port-recovery.md)。启动脚本也会刷新继承的旧代理地址。
+
 ## 在办公室电脑使用
 
 1. 下载仓库 ZIP 并解压。
@@ -32,6 +34,8 @@
 - Gemini 出现在模型列表，但旧对话仍连接 OpenAI。
 - GPT 能回答，Gemini 提示 `not supported when using Codex with a ChatGPT account`。
 - 本机请求也走系统代理，出现 502；`NO_PROXY` 新值没有进入已打开的桌面进程。
+- 代理软件换了端口，后台仍连接旧地址；开机等待一次没有解决使用途中重开代理后的断连。
+- Gemini 的 `Token refresh failed` 实际由连接 Google 授权服务器失败引起，不能直接认定登录失效。
 - 服务端口有响应，却提示 `Proxy service is currently disabled`。
 - 后台进程随测试进程或软件退出，重开以后失联。
 - Windows PowerShell 读取 UTF-8 文件出错、错误配置层级、认证混用。
@@ -56,6 +60,7 @@
 - [完整安装流程](references/install.md)：从检查环境到桌面验收。
 - [多模型追加指南](references/add-models.md)：3.5 Flash-Lite、3.8 Flash、3.1 Pro，一起追加并保留已有模型。
 - [报错排查表](references/troubleshooting.md)：按实际症状定位。
+- [代理端口变化与恢复](references/proxy-port-recovery.md)：2026-09-22 故障证据、恢复和自动跟随的实施要求。
 - [来源与版本基线](references/sources.md)：上游项目与官方文档。
 - `scripts/`：不含账号的辅助脚本。
 - `tests/`：无需联网和登录的隔离测试。

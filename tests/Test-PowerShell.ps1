@@ -27,6 +27,8 @@ $catalog = Join-Path $toolRoot 'native-models.json'
 $priorCodexRoot = $env:CODEX_HOME
 $originalNoProxy = $env:NO_PROXY
 $originalApiKey = $env:OPENAI_API_KEY
+$originalHttpProxy = $env:HTTP_PROXY
+$originalHttpsProxy = $env:HTTPS_PROXY
 try {
     # Isolate the fixture using the application's supported home setting.
     $env:CODEX_HOME = $codexRoot
@@ -53,21 +55,37 @@ try {
     Move-Item -LiteralPath (Join-Path $codexRoot 'antigravity-openai.json') -Destination (Join-Path $fixture 'held-api-fixture.json')
     '{"proxy":{"enabled":true,"port":8045,"allow_lan_access":false,"api_key":"FIXTURE_LOCAL_ONLY"}}' | Set-Content -LiteralPath $proxyConfig -Encoding UTF8
     $callerLocalKey = $env:LOCAL_GEMINI_PROXY_KEY
+    $env:HTTP_PROXY = 'http://127.0.0.1:21761'
+    $env:HTTPS_PROXY = 'http://127.0.0.1:21761'
+    function Get-ItemProperty {
+        param([string]$LiteralPath)
+        if ($LiteralPath -ne 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings') { throw 'Unexpected registry request.' }
+        [pscustomobject]@{ProxyEnable=1;ProxyServer='127.0.0.1:23054'}
+    }
     # Fail after temporary environment changes, before any real process can start.
-    function Get-NetTCPConnection { throw 'FIXTURE_PERMISSION_DENIED' }
+    function Get-NetTCPConnection {
+        if ($env:HTTP_PROXY -ne 'http://127.0.0.1:23054' -or $env:HTTPS_PROXY -ne 'http://127.0.0.1:23054') {
+            throw 'Stale inherited proxy was not refreshed before service startup.'
+        }
+        throw 'FIXTURE_PERMISSION_DENIED'
+    }
     try {
         $rejected = $false
         try { & $start @params } catch { $rejected = $_.Exception.Message -like '*FIXTURE_PERMISSION_DENIED*' }
         if (-not $rejected) { throw 'Late startup failure did not reach the isolated guard.' }
-        if ($env:NO_PROXY -ne 'corp.fixture' -or $env:OPENAI_API_KEY -ne 'FIXTURE_KEY_ONLY' -or $env:LOCAL_GEMINI_PROXY_KEY -ne $callerLocalKey) {
+        if ($env:NO_PROXY -ne 'corp.fixture' -or $env:OPENAI_API_KEY -ne 'FIXTURE_KEY_ONLY' -or $env:LOCAL_GEMINI_PROXY_KEY -ne $callerLocalKey -or
+            $env:HTTP_PROXY -ne 'http://127.0.0.1:21761' -or $env:HTTPS_PROXY -ne 'http://127.0.0.1:21761') {
             throw 'Caller environment was not restored after a late startup failure.'
         }
-    } finally { Remove-Item Function:Get-NetTCPConnection }
+    } finally { Remove-Item Function:Get-NetTCPConnection; Remove-Item Function:Get-ItemProperty }
 } finally {
     [Environment]::SetEnvironmentVariable('CODEX_HOME',$priorCodexRoot,'Process')
     [Environment]::SetEnvironmentVariable('NO_PROXY',$originalNoProxy,'Process')
     [Environment]::SetEnvironmentVariable('OPENAI_API_KEY',$originalApiKey,'Process')
+    [Environment]::SetEnvironmentVariable('HTTP_PROXY',$originalHttpProxy,'Process')
+    [Environment]::SetEnvironmentVariable('HTTPS_PROXY',$originalHttpsProxy,'Process')
 }
 Write-Output 'STARTUP_GUARDS_PASS: disabled, LAN, paid-route, no secret output, environment restored after early and late failure.'
+Write-Output 'PROXY_PORT_CHANGE_PASS: new system proxy overrides stale inherited values; caller values restored.'
 # Keep isolated fixtures available for review; never recursively delete arbitrary paths.
 Write-Output ('FIXTURE_DIRECTORY=' + $fixture)

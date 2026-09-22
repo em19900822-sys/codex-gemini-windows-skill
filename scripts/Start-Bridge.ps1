@@ -59,8 +59,10 @@ $env:NO_PROXY = (($proxyEntries -join ',') -split ',' | ForEach-Object { $_.Trim
     Where-Object { $_ } | Select-Object -Unique) -join ','
 $systemProxy = Get-ItemProperty -LiteralPath 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings'
 if ($systemProxy.ProxyEnable -eq 1 -and $systemProxy.ProxyServer -match '^[^=;]+:\d+$') {
-    if (-not $env:HTTPS_PROXY) { $env:HTTPS_PROXY = 'http://' + $systemProxy.ProxyServer }
-    if (-not $env:HTTP_PROXY) { $env:HTTP_PROXY = 'http://' + $systemProxy.ProxyServer }
+    # A restarted network proxy can choose a new port. Refresh the child process
+    # environment even when the caller still has yesterday's proxy variables.
+    $env:HTTPS_PROXY = 'http://' + $systemProxy.ProxyServer
+    $env:HTTP_PROXY = $env:HTTPS_PROXY
 }
 function Wait-LocalHealth([int]$Port) {
     $deadline = (Get-Date).AddSeconds(25)

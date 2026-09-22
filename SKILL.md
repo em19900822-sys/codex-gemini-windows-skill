@@ -22,6 +22,7 @@ Codex 新对话 → local-unified → 本机统一中转
 - 全新安装或另一台电脑：读 [references/install.md](references/install.md)，先检查已有环境，再部署。
 - 已能使用、需要增加 Gemini：读 [references/add-models.md](references/add-models.md)。包含 3.5 Flash-Lite、3.8 Flash、3.1 Pro 的本机验证记录、多个模型一起追加及保留原 GPT/3.7 的流程；新电脑仍以账号实际可用 ID 为准。
 - 已经安装但报错：读 [references/troubleshooting.md](references/troubleshooting.md)，先定位失败层，不先重装。
+- 重启代理后再次断连、Google 授权刷新连接失败，或要保留后台自动连接但手动打开 Codex：读 [references/proxy-port-recovery.md](references/proxy-port-recovery.md)。先比较当前代理地址与后台实际继承的地址，再恢复；不要把所有 502/503 都归因于启动顺序。
 - 用户只问状态：使用 `scripts/diagnose.py` 做只读检查；不要自动重写配置。
 - 回退：读取目标电脑自己的备份和安装记录。优先恢复本次修改项，不从其他电脑复制配置覆盖。
 
@@ -32,6 +33,7 @@ Codex 新对话 → local-unified → 本机统一中转
 - 用户在办公室电脑自行完成必要的 ChatGPT/Google 登录。Skill、GitHub 仓库和压缩包中不得包含 `auth.json`、实际 `gui_config.json`、令牌、Cookie、密钥、聊天日志或完整原生模型缓存。
 - 沿用现有账号额度前说明会做少量连接测试。需要新增付费 API、订阅、充值或用量计费时，先说明费用并获得明确同意；不要把“免费”“不限量”写成保证。
 - 只监听回环地址。不要把 GPT 请求映射成 Gemini；不要点击可能覆盖 Codex 配置的“同步 Codex”按钮。
+- Codex 桌面窗口自启动与模型后台自启动是两项设置。用户只要求关闭窗口自启动时，不停用后台；没有发现桌面自启动项就如实说明，不能拿停用后台代替。
 - `openai` 是内置提供商 ID。不要覆盖其定义，不要编辑正在运行的对话数据库来强改历史绑定。
 - 当前任务是否允许写文件、联网或启动进程，以运行环境实际权限为准；权限不足应使用正式提权流程，不能把“访问被拒绝”报告为“服务不存在”。
 

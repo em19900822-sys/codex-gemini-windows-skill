@@ -7,6 +7,9 @@
 | GPT 能用；Gemini 报 not supported when using Codex with a ChatGPT account | 当前对话 modelProvider；新对话默认提供商；中转有无对应请求 | 旧对话若为 openai，请求仍送到 OpenAI。新建使用 local-unified 的工作对话；不靠重启自动迁移历史 |
 | 菜单看到 Gemini，但实际聊天失败 | 新对话实际请求地址、状态、后台路由；不仅看 model/list | 模型目录只影响可选项；需要检查实际连接、认证和传输 |
 | 502，URL 是 127.0.0.1 的 /responses | 直接绕过系统代理的本机健康请求，与原进程请求对照；NO_PROXY 进程值/用户值 | 保留已有例外并加入本机地址；完全退出并重开桌面。仅测试进程成功仍不能算桌面成功 |
+| 代理重启后 GPT 502 / OpenAI upstream is unreachable，或 Gemini 503 / Token refresh failed / client error (Connect) | 当前系统代理地址、该端口监听者、中转实际进程的 HTTP_PROXY/HTTPS_PROXY、进程启动时间；用当前代理做无认证连通检查 | 地址不一致且旧端口不可达时，只重载确认身份的后台进程，使其继承当前代理；随后验证两款模型回复。参见 [端口变化与恢复](proxy-port-recovery.md) |
+| Google 授权服务器连接失败，但本机 /health 为 200 | oauth2.googleapis.com 的无认证连通性、失败层及脱敏异常类型 | 本机存活不代表能访问 Google；Connect 错误不能直接当作登录失效或账号被封。先修连接，不删除登录 |
+| 开机等待代理后正常，使用途中重开代理又断线 | 启动器是否在启动成功后退出；是否只等待一次、没有处理地址变化 | 按用户所需设置后台端口跟随，不新增用户手动操作；端口不变时不反复重启，不打开 Codex 窗口 |
 | 503 / Proxy service is currently disabled | 反重力 proxy.enabled；请求时间对应日志 | 备份后通过受支持设置启用；重载后复查，端口在监听不代表内部服务已启用 |
 | Connection refused / 10061 | 两段端口与实际进程，权限状态 | 确认服务启动。命令被沙箱拒绝要提权检查，不先宣称端口不存在 |
 | 服务测试时在，结束后不在 | 启动器退出后的进程、退出时间和日志 | 检查执行工具是否回收子进程，使用经允许的独立启动方式；复查进程持续存在 |
