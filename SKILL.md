@@ -23,6 +23,7 @@ Codex 新对话 → local-unified → 本机统一中转
 - 已能使用、需要增加 Gemini：读 [references/add-models.md](references/add-models.md)。包含 3.5 Flash-Lite、3.8 Flash、3.1 Pro 的本机验证记录、多个模型一起追加及保留原 GPT/3.7 的流程；新电脑仍以账号实际可用 ID 为准。
 - 已经安装但报错：读 [references/troubleshooting.md](references/troubleshooting.md)，先定位失败层，不先重装。
 - 重启代理后再次断连、Google 授权刷新连接失败，或要保留后台自动连接但手动打开 Codex：读 [references/proxy-port-recovery.md](references/proxy-port-recovery.md)。先比较当前代理地址与后台实际继承的地址，再恢复；不要把所有 502/503 都归因于启动顺序。
+- 短对话能回答，但长对话反复约两分钟后断开：读 [references/long-conversation-timeout.md](references/long-conversation-timeout.md)。先核对实际代理与失败耗时，再考虑仅调整提供商等待时间；短测试不能替代原长对话验收。
 - 用户只问状态：使用 `scripts/diagnose.py` 做只读检查；不要自动重写配置。
 - 回退：读取目标电脑自己的备份和安装记录。优先恢复本次修改项，不从其他电脑复制配置覆盖。
 

@@ -8,6 +8,7 @@
 | 菜单看到 Gemini，但实际聊天失败 | 新对话实际请求地址、状态、后台路由；不仅看 model/list | 模型目录只影响可选项；需要检查实际连接、认证和传输 |
 | 502，URL 是 127.0.0.1 的 /responses | 直接绕过系统代理的本机健康请求，与原进程请求对照；NO_PROXY 进程值/用户值 | 保留已有例外并加入本机地址；完全退出并重开桌面。仅测试进程成功仍不能算桌面成功 |
 | 代理重启后 GPT 502 / OpenAI upstream is unreachable，或 Gemini 503 / Token refresh failed / client error (Connect) | 当前系统代理地址、该端口监听者、中转实际进程的 HTTP_PROXY/HTTPS_PROXY、进程启动时间；用当前代理做无认证连通检查 | 地址不一致且旧端口不可达时，只重载确认身份的后台进程，使其继承当前代理；随后验证两款模型回复。参见 [端口变化与恢复](proxy-port-recovery.md) |
+| 长对话反复约 120 秒后出现 The provider connection failed，但同模型短对话正常 | 当前代理与后台环境、失败耗时、历史消息计数、该版本的有效传输超时 | 证据吻合后，仅通过安全配置接口调整目标提供商 timeout，并验证原长对话；见 [长对话等待上限](long-conversation-timeout.md)。不默认重装或重新登录 |
 | Google 授权服务器连接失败，但本机 /health 为 200 | oauth2.googleapis.com 的无认证连通性、失败层及脱敏异常类型 | 本机存活不代表能访问 Google；Connect 错误不能直接当作登录失效或账号被封。先修连接，不删除登录 |
 | 开机等待代理后正常，使用途中重开代理又断线 | 启动器是否在启动成功后退出；是否只等待一次、没有处理地址变化 | 按用户所需设置后台端口跟随，不新增用户手动操作；端口不变时不反复重启，不打开 Codex 窗口 |
 | 503 / Proxy service is currently disabled | 反重力 proxy.enabled；请求时间对应日志 | 备份后通过受支持设置启用；重载后复查，端口在监听不代表内部服务已启用 |
